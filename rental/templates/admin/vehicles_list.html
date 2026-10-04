@@ -1,0 +1,32 @@
+{% extends 'layout_admin.html' %}
+{% from 'partials/_vehicle_table.html' import vehicle_table with context %}
+{% from 'partials/_pagination.html' import pagination %}
+{% from 'partials/_icons.html' import icon %}
+{% block title %}Vehicles &middot; Vehicle Rental{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex flex-wrap items-end justify-between gap-3">
+  <div>
+    <h1 class="page-title">Vehicles</h1>
+    <p class="mt-1 text-sm text-muted">
+      {{ total }} vehicle{{ '' if total == 1 else 's' }} in the fleet
+    </p>
+  </div>
+  <div class="flex gap-2">
+    <a class="btn btn-ghost" href="{{ url_for('admin_fleet.search') }}">{{ icon('search', 'h-4 w-4') }} Search</a>
+    {% if is_admin %}
+      <a class="btn btn-primary" href="{{ url_for('admin_fleet.add_vehicle') }}">{{ icon('plus', 'h-4 w-4') }} Add Vehicle</a>
+    {% endif %}
+  </div>
+</div>
+
+<div class="card overflow-hidden">
+  {{ vehicle_table(vehicles, sort, direction, 'No vehicles yet. Add the first one to get started.') }}
+</div>
+
+{{ pagination(page, total_pages) }}
+
+{% if total_pages > 1 %}
+  <p class="mt-2 text-center text-xs text-muted">Page {{ page }} of {{ total_pages }}</p>
+{% endif %}
+{% endblock %}

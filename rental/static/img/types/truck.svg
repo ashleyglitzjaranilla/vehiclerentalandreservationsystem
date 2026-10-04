@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 90" role="img" aria-label="Truck">
+  <path fill="#cbd5e1" d="M18 54V44L40 26H66V10H140V48a6 6 0 0 0-6 6H18Z"/>
+  <path fill="#94a3b8" d="M44 30h16v10H36Z"/>
+  <circle cx="40" cy="56" r="13" fill="#94a3b8"/><circle cx="40" cy="56" r="6" fill="#f1f5f9"/>
+  <circle cx="118" cy="56" r="13" fill="#94a3b8"/><circle cx="118" cy="56" r="6" fill="#f1f5f9"/>
+</svg>

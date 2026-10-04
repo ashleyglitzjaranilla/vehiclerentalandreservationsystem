@@ -1,0 +1,21 @@
+<a class="top-link" href="{{ url_for('public.landing') }}">Home</a>
+<a class="top-link" href="{{ url_for('public.browse') }}">Browse Vehicles</a>
+{% if is_customer %}
+  <a class="top-link" href="{{ url_for('portal.dashboard') }}">My Dashboard</a>
+  <a class="top-link" href="{{ url_for('portal.reservations') }}">My Reservations</a>
+  <a class="top-link" href="{{ url_for('portal.rentals') }}">My Rentals</a>
+  <a class="top-link" href="{{ url_for('portal.profile') }}">Profile</a>
+  <form method="post" action="{{ url_for('auth.logout') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="top-link w-full text-left">Log out</button>
+  </form>
+{% elif is_admin %}
+  <a class="top-link" href="{{ url_for('admin_dashboard.dashboard') }}">Admin Console</a>
+  <form method="post" action="{{ url_for('auth.logout') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="top-link w-full text-left">Log out</button>
+  </form>
+{% else %}
+  <a class="top-link" href="{{ url_for('auth.login') }}">Log in</a>
+  <a class="btn btn-primary btn-sm" href="{{ url_for('auth.signup') }}">Create account</a>
+{% endif %}

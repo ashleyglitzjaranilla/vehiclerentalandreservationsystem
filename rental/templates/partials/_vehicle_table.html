@@ -1,0 +1,76 @@
+{# Vehicle listing table, shared by the Vehicles page and the Search page. #}
+{% from 'partials/_icons.html' import icon %}
+
+{% macro sort_header(label, key, sort, direction) %}
+  {% set next_dir = 'desc' if (sort == key and direction == 'asc') else 'asc' %}
+  {% set params = request.args.to_dict() %}
+  {% set _ = params.update({'sort': key, 'dir': next_dir, 'page': 1}) %}
+  <a class="inline-flex items-center gap-1 whitespace-nowrap transition hover:text-brand-500
+            {% if sort == key %}text-brand-500{% endif %}"
+     href="{{ url_for(request.endpoint, **params) }}">
+    {{ label }}
+    {% if sort == key %}
+      <span aria-hidden="true">{{ '↑' if direction == 'asc' else '↓' }}</span>
+      <span class="sr-only">sorted {{ 'ascending' if direction == 'asc' else 'descending' }}</span>
+    {% endif %}
+  </a>
+{% endmacro %}
+
+{% macro vehicle_table(vehicles, sort, direction, empty_message) %}
+  {% if vehicles %}
+    <div class="overflow-x-auto">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>{{ sort_header('Plate', 'plate', sort, direction) }}</th>
+            <th class="hidden sm:table-cell">{{ sort_header('Vehicle', 'brand', sort, direction) }}</th>
+            <th class="hidden lg:table-cell">Type</th>
+            <th class="hidden md:table-cell">Seats</th>
+            <th>{{ sort_header('Rate', 'rate', sort, direction) }}</th>
+            <th>Status</th>
+            <th class="no-print text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for vehicle in vehicles %}
+            <tr>
+              <td class="whitespace-nowrap font-mono text-xs font-semibold tracking-tight sm:text-[13px]">{{ vehicle.plate_number }}</td>
+              <td class="hidden sm:table-cell">
+                <p class="font-semibold text-ink">{{ vehicle.brand }} {{ vehicle.model }}</p>
+                <p class="text-xs text-muted">{{ vehicle.year }}</p>
+              </td>
+              <td class="hidden text-muted lg:table-cell">{{ vehicle.vehicle_type }}</td>
+              <td class="hidden text-muted md:table-cell">{{ vehicle.seats or '—' }}</td>
+              <td class="font-mono text-sm whitespace-nowrap">₱{{ '{:,.2f}'.format(vehicle.daily_rate) }}</td>
+              <td>
+                <span class="pill {{ vehicle.badge_class }}">{{ vehicle.status }}</span>
+                {% if not vehicle.is_active %}<span class="pill pill-red">DISABLED</span>{% endif %}
+              </td>
+              <td class="no-print">
+                {# View is for everyone; the two that change data are added
+                   only for an admin. #}
+                <div class="flex flex-col items-stretch gap-1.5 sm:flex-row sm:justify-end sm:gap-2">
+                  <a class="btn btn-sm btn-ghost"
+                     href="{{ url_for('admin_fleet.view_vehicle', vehicle_id=vehicle.id) }}">View</a>
+                  {% if is_admin %}
+                    <a class="btn btn-sm btn-primary"
+                       href="{{ url_for('admin_fleet.edit_vehicle', vehicle_id=vehicle.id) }}">Edit</a>
+                    <a class="btn btn-sm btn-ghost text-red-600 hover:bg-red-50"
+                       href="{{ url_for('admin_fleet.delete_vehicle', vehicle_id=vehicle.id) }}">Delete</a>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="flex flex-col items-center gap-3 px-6 py-16 text-center">
+      <span class="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+        {{ icon('car', 'h-6 w-6') }}
+      </span>
+      <p class="text-sm text-muted">{{ empty_message }}</p>
+    </div>
+  {% endif %}
+{% endmacro %}

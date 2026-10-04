@@ -1,0 +1,95 @@
+{% extends 'layout_public.html' %}
+{% block title %}{{ reservation.reservation_number }} &middot; Vehicle Rental{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex items-center gap-3">
+  <h1 class="page-title">{{ reservation.reservation_number }}</h1>
+  <span class="pill {{ reservation.badge_class }}">{{ reservation.status }}</span>
+</div>
+
+<div class="grid gap-6 lg:grid-cols-[3fr_2fr]">
+  <div class="card p-5">
+    <h2 class="text-base font-bold tracking-tight text-ink">{{ vehicle.display_name }}</h2>
+    <p class="text-sm text-muted">{{ vehicle.vehicle_type }} &middot; {{ vehicle.plate_number }}</p>
+
+    <dl class="mt-5 grid grid-cols-2 gap-4">
+      <div>
+        <dt class="stat-label">Pickup</dt>
+        <dd class="text-sm font-semibold text-ink">{{ reservation.pickup_at.strftime('%d %b %Y, %I:%M %p') }}</dd>
+      </div>
+      <div>
+        <dt class="stat-label">Return</dt>
+        <dd class="text-sm font-semibold text-ink">{{ reservation.return_at.strftime('%d %b %Y, %I:%M %p') }}</dd>
+      </div>
+      <div>
+        <dt class="stat-label">Pickup location</dt>
+        <dd class="text-sm font-semibold text-ink">{{ reservation.pickup_location or '—' }}</dd>
+      </div>
+      <div>
+        <dt class="stat-label">Return location</dt>
+        <dd class="text-sm font-semibold text-ink">{{ reservation.return_location or '—' }}</dd>
+      </div>
+      <div>
+        <dt class="stat-label">Duration</dt>
+        <dd class="text-sm font-semibold text-ink">
+          {{ reservation.rental_hours }} hour(s) &middot; {{ reservation.rental_days }} billable day(s)
+        </dd>
+      </div>
+      <div>
+        <dt class="stat-label">Extras</dt>
+        <dd class="text-sm font-semibold text-ink">
+          {% if reservation.want_additional_driver or reservation.want_insurance %}
+            {{ 'Additional driver' if reservation.want_additional_driver }}{{ ', ' if reservation.want_additional_driver and reservation.want_insurance }}{{ 'Insurance' if reservation.want_insurance }}
+          {% else %}None{% endif %}
+        </dd>
+      </div>
+    </dl>
+  </div>
+
+  <div class="lg:sticky lg:top-24 lg:self-start">
+    <div class="card p-5">
+      {# The figures were frozen when the booking was made. A later change to
+         the fee table must never alter what someone already booked. #}
+      <table class="w-full text-sm">
+        <tbody>
+          <tr class="border-b border-line">
+            <td class="py-2">
+              <span class="font-medium text-ink">Base rental</span>
+              <span class="block text-xs text-muted">
+                ₱{{ '{:,.2f}'.format(reservation.daily_rate) }} x {{ reservation.rental_days }} day(s)
+              </span>
+            </td>
+            <td class="py-2 text-right font-semibold text-ink">₱{{ '{:,.2f}'.format(reservation.base_amount) }}</td>
+          </tr>
+          <tr class="border-b border-line">
+            <td class="py-2"><span class="font-medium text-ink">Additional fees</span></td>
+            <td class="py-2 text-right font-semibold text-ink">₱{{ '{:,.2f}'.format(reservation.additional_fees) }}</td>
+          </tr>
+          <tr>
+            <td class="pt-3 text-sm font-semibold text-ink">Total</td>
+            <td class="pt-3 text-right"><span class="rate">₱{{ '{:,.2f}'.format(reservation.total_amount) }}</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="mt-4 flex items-center justify-between border-t border-line pt-4">
+        <span class="stat-label">Payment Status</span>
+        <span class="pill pill-amber">Pending</span>
+      </div>
+      <p class="mt-1.5 text-xs text-muted">Settle at the counter when you collect the vehicle.</p>
+
+      {% if can_cancel %}
+        <form method="post" class="mt-4"
+              action="{{ url_for('portal.cancel', reservation_id=reservation.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn btn-ghost w-full">Cancel this reservation</button>
+        </form>
+      {% elif reservation.status in ['PENDING', 'CONFIRMED'] %}
+        <p class="mt-4 text-sm text-muted">
+          This booking can no longer be cancelled online. Please contact the office.
+        </p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

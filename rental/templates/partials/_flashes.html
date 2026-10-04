@@ -1,0 +1,18 @@
+{# Flash messages. A macro so the full-bleed login page can place them itself. #}
+
+{% macro flashes(dark=false) %}
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="no-print mb-5 space-y-2.5">
+        {% for category, message in messages %}
+          {% set style = {
+            'success': 'alert-success', 'error': 'alert-error', 'warning': 'alert-warning'
+          }.get(category, 'alert-info') %}
+          <div role="alert" class="alert {{ style }}">
+            <span>{{ message }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+{% endmacro %}

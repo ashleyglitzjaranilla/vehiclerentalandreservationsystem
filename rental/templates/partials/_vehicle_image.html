@@ -1,0 +1,12 @@
+{# A vehicle's photograph, or the silhouette for its body style when it has none.
+   Kept in one macro so the browse grid, the detail page and the admin table all
+   fall back identically. #}
+
+{% macro vehicle_image(vehicle, cls='h-full w-full object-cover') %}
+  {% if vehicle.image_url %}
+    <img src="{{ vehicle.image_url }}" alt="{{ vehicle.display_name }}" class="{{ cls }}" loading="lazy">
+  {% else %}
+    <img src="{{ url_for('static', filename='img/types/' ~ vehicle.type_slug ~ '.svg') }}"
+         alt="{{ vehicle.vehicle_type }} illustration" class="h-3/5 w-3/5 object-contain opacity-80">
+  {% endif %}
+{% endmacro %}

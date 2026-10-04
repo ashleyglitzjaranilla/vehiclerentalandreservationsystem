@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 90" role="img" aria-label="Motorcycle">
+  <circle cx="40" cy="54" r="15" fill="#94a3b8"/><circle cx="40" cy="54" r="6" fill="#f1f5f9"/>
+  <circle cx="120" cy="54" r="15" fill="#94a3b8"/><circle cx="120" cy="54" r="6" fill="#f1f5f9"/>
+  <path fill="#94a3b8" d="M112 46 96 30 99 27 115 43ZM96 26 52 22 52 28 96 32ZM112 46 52 26 52 32 112 52ZM54 24 42 54 38 54 50 24Z"/>
+  <rect x="44" y="19" width="20" height="5" rx="2" fill="#94a3b8"/>
+  <rect x="70" y="44" width="28" height="14" rx="4" fill="#cbd5e1"/>
+  <ellipse cx="86" cy="37" rx="14" ry="7" fill="#cbd5e1"/>
+  <rect x="98" y="32" width="22" height="6" rx="3" fill="#cbd5e1"/>
+</svg>

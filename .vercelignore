@@ -1,0 +1,13 @@
+# Never upload local secrets or the local database.
+.env
+*.db
+
+# Local tooling that the deployed app does not need.
+.venv
+tests/
+.pytest_cache/
+__pycache__/
+
+# CSS build sources. Only the built rental/static/css/output.css is served,
+# and it is committed, so Vercel needs no build step.
+rental/static/src/

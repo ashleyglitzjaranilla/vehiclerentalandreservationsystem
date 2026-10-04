@@ -1,0 +1,45 @@
+{% extends 'layout_admin.html' %}
+{% from 'partials/_icons.html' import icon %}
+{% block title %}Delete vehicle &middot; Vehicle Rental{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+  <h1 class="page-title">Delete Vehicle</h1>
+  <p class="mt-1 text-sm text-muted">Please confirm before this vehicle is removed.</p>
+</div>
+
+<div class="card max-w-xl overflow-hidden">
+  <div class="flex items-start gap-3 border-b border-red-100 bg-red-50 px-6 py-4">
+    <span class="mt-0.5 text-red-600">{{ icon('warning') }}</span>
+    <div>
+      <p class="text-sm font-semibold text-red-800">This cannot be undone.</p>
+      <p class="mt-0.5 text-sm text-red-700">The vehicle will be permanently removed from the fleet.</p>
+    </div>
+  </div>
+
+  <dl class="divide-y divide-line px-6">
+    {% set rows = [
+      ('Plate', vehicle.plate_number),
+      ('Vehicle', vehicle.year ~ ' ' ~ vehicle.brand ~ ' ' ~ vehicle.model),
+      ('Type', vehicle.vehicle_type),
+      ('Color', vehicle.color or '—')
+    ] %}
+    {% for label, value in rows %}
+      <div class="flex justify-between gap-4 py-3.5 text-sm">
+        <dt class="text-muted">{{ label }}</dt>
+        <dd class="{% if label == 'Plate' %}font-mono {% endif %}font-semibold text-ink">{{ value }}</dd>
+      </div>
+    {% endfor %}
+    <div class="flex justify-between gap-4 py-3.5 text-sm">
+      <dt class="text-muted">Status</dt>
+      <dd><span class="pill {{ vehicle.badge_class }}">{{ vehicle.status }}</span></dd>
+    </div>
+  </dl>
+
+  <form method="post" class="flex justify-end gap-2 border-t border-line bg-slate-50 px-6 py-4">
+    {{ form.hidden_tag() }}
+    <a class="btn btn-ghost" href="{{ url_for('admin_fleet.list_vehicles') }}">Cancel</a>
+    {{ form.submit(class="btn btn-danger") }}
+  </form>
+</div>
+{% endblock %}

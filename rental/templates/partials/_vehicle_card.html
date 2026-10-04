@@ -1,0 +1,38 @@
+{% from 'partials/_vehicle_image.html' import vehicle_image %}
+
+{% macro vehicle_card(vehicle, verdict=None, window='') %}
+<article class="vehicle-card">
+  <div class="vehicle-card-media">{{ vehicle_image(vehicle) }}</div>
+  <div class="flex flex-1 flex-col gap-3 p-5">
+    <div>
+      <h3 class="text-base font-bold tracking-tight text-ink">{{ vehicle.brand }} {{ vehicle.model }}</h3>
+      <p class="text-sm text-muted">{{ vehicle.vehicle_type }} &middot; {{ vehicle.year }}</p>
+    </div>
+    {% if verdict %}
+      {% if verdict.ok %}
+        <p class="pill pill-green">Available for your dates</p>
+      {% else %}
+        <p class="pill pill-amber">Not available for your dates</p>
+      {% endif %}
+    {% endif %}
+
+    <div class="flex flex-wrap gap-1.5">
+      <span class="spec-chip">{{ vehicle.seats }} Seats</span>
+      <span class="spec-chip">{{ vehicle.transmission }}</span>
+      <span class="spec-chip">{{ vehicle.fuel_type }}</span>
+    </div>
+
+    <div class="mt-auto flex items-end justify-between gap-3 pt-2">
+      <p>
+        <span class="rate">₱{{ '{:,.0f}'.format(vehicle.daily_rate) }}</span>
+        <span class="text-sm text-muted">/ day</span>
+      </p>
+      <span class="pill {{ vehicle.badge_class }}">{{ vehicle.status }}</span>
+    </div>
+
+    <a class="btn btn-primary w-full" href="{{ url_for('public.vehicle_detail', vehicle_id=vehicle.id) }}{{ window }}">
+      View Details
+    </a>
+  </div>
+</article>
+{% endmacro %}

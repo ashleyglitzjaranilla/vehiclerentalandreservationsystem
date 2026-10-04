@@ -1,0 +1,162 @@
+@import "tailwindcss" source(none);
+@source "../../templates";
+
+/* The status pill colours are chosen in Python (models.STATUS_BADGES), so they
+   never appear literally in a template and Tailwind cannot find them by
+   scanning. Listing them here keeps them in the build. */
+@source inline("pill-green pill-blue pill-amber pill-slate pill-red");
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* Neutrals */
+  --color-canvas: #f1f4f9;
+  --color-line: #e3e8f0;
+  --color-ink: #0f172a;
+  --color-muted: #64748b;
+
+  /* The sidebar and the login panel */
+  --color-navy-600: #234b7d;
+  --color-navy-700: #1a3a63;
+  --color-navy-800: #132c4d;
+  --color-navy-900: #0d1f38;
+
+  /* Primary action colour */
+  --color-brand-500: #2563eb;
+  --color-brand-600: #1d4ed8;
+}
+
+@layer base {
+  body {
+    @apply bg-canvas text-ink font-sans antialiased;
+  }
+}
+
+@layer components {
+  /* ---- Surfaces ---------------------------------------------------- */
+  .card {
+    @apply rounded-xl border border-line bg-white;
+    box-shadow: 0 1px 2px rgb(15 23 42 / 0.04), 0 10px 28px -18px rgb(15 23 42 / 0.25);
+  }
+
+  .page-title {
+    @apply text-2xl font-bold tracking-tight text-ink;
+  }
+
+  /* ---- Buttons ----------------------------------------------------- */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5
+           text-sm font-semibold transition-colors
+           focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500;
+  }
+  .btn-primary { @apply bg-brand-500 text-white hover:bg-brand-600; }
+  .btn-success { @apply bg-emerald-600 text-white hover:bg-emerald-700; }
+  .btn-danger  { @apply bg-red-600 text-white hover:bg-red-700; }
+  .btn-ghost   { @apply border border-line bg-white text-ink hover:bg-slate-50; }
+  .btn-sm      { @apply rounded-md px-3 py-1.5 text-xs; }
+
+  /* ---- Status pills ------------------------------------------------ */
+  .pill {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1
+           text-xs font-semibold whitespace-nowrap;
+  }
+  .pill-green { @apply bg-emerald-100 text-emerald-700; }
+  .pill-blue  { @apply bg-sky-100 text-sky-700; }
+  .pill-amber { @apply bg-amber-100 text-amber-800; }
+  .pill-slate { @apply bg-slate-200 text-slate-700; }
+  .pill-red   { @apply bg-red-100 text-red-700; }
+
+  /* ---- Form controls ----------------------------------------------- */
+  .field-label { @apply mb-1.5 block text-sm font-medium text-ink; }
+  .field-hint  { @apply mt-1.5 text-xs text-muted; }
+  .field-error { @apply mt-1.5 text-xs font-medium text-red-600; }
+
+  .field {
+    @apply w-full rounded-lg border border-line bg-white px-3.5 py-2.5 text-sm text-ink
+           transition placeholder:text-slate-400
+           focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/10;
+  }
+  .field-invalid {
+    @apply border-red-400 focus:border-red-500 focus:ring-red-500/10;
+  }
+
+  /* ---- Sidebar navigation ------------------------------------------ */
+  .nav-link {
+    @apply flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium
+           text-slate-300 transition-colors hover:bg-white/10 hover:text-white;
+  }
+  .nav-link-active {
+    @apply bg-brand-500 text-white hover:bg-brand-500 hover:text-white;
+  }
+
+  /* ---- Data tables -------------------------------------------------- */
+  .data-table { @apply w-full border-collapse text-sm; }
+  .data-table thead th {
+    @apply border-b border-line bg-slate-50 px-3 py-3 text-left sm:px-4
+           text-xs font-semibold uppercase tracking-wider text-muted;
+  }
+  .data-table tbody td { @apply border-b border-line px-3 py-3.5 align-middle sm:px-4; }
+  .data-table tbody tr:last-child td { @apply border-b-0; }
+  .data-table tbody tr:hover { @apply bg-slate-50; }
+
+  /* ---- Flash messages ----------------------------------------------- */
+  .alert { @apply flex items-start gap-3 rounded-lg border px-4 py-3 text-sm font-medium; }
+  .alert-success { @apply border-emerald-200 bg-emerald-50 text-emerald-800; }
+  .alert-error   { @apply border-red-200 bg-red-50 text-red-800; }
+  .alert-warning { @apply border-amber-200 bg-amber-50 text-amber-900; }
+  .alert-info    { @apply border-sky-200 bg-sky-50 text-sky-800; }
+
+  /* ---- Storefront ---------------------------------------------------- */
+  .top-link {
+    @apply rounded-lg px-3 py-2 text-sm font-semibold text-muted
+           transition-colors hover:bg-slate-100 hover:text-ink;
+  }
+
+  .vehicle-card {
+    @apply flex flex-col overflow-hidden rounded-xl border border-line bg-white transition;
+    box-shadow: 0 1px 2px rgb(15 23 42 / 0.04), 0 10px 28px -18px rgb(15 23 42 / 0.25);
+  }
+  .vehicle-card:hover { @apply -translate-y-0.5 border-brand-500/40; }
+
+  .vehicle-card-media {
+    @apply flex aspect-[16/10] w-full items-center justify-center bg-slate-100;
+  }
+
+  .spec-chip {
+    @apply inline-flex items-center gap-1.5 rounded-md bg-slate-100 px-2 py-1
+           text-xs font-medium text-slate-600;
+  }
+
+  .rate { @apply font-mono text-xl font-bold tracking-tight text-ink; }
+
+  /* Same visual result as `.card p-5`, but written out: Tailwind v4's @apply
+     only resolves real utilities, not other hand-rolled component classes,
+     so `.card` itself cannot be applied here. */
+  .stat-card {
+    @apply rounded-xl border border-line bg-white p-5;
+    box-shadow: 0 1px 2px rgb(15 23 42 / 0.04), 0 10px 28px -18px rgb(15 23 42 / 0.25);
+  }
+  .stat-label { @apply text-xs font-semibold uppercase tracking-wider text-muted; }
+  .stat-value { @apply mt-1.5 text-3xl font-bold tracking-tight text-ink; }
+}
+
+/* Print styles, used mainly by the Reports page: drop the navigation, the
+   buttons and the page background so only the tables reach the paper. */
+@media print {
+  .no-print { display: none !important; }
+
+  body { background: #fff; color: #000; }
+
+  .app-main { margin-left: 0 !important; padding: 0 !important; }
+
+  .card {
+    border: 1px solid #ccc;
+    box-shadow: none;
+    break-inside: avoid;
+  }
+
+  .pill { border: 1px solid #666; background: transparent !important; color: #000 !important; }
+
+  .data-table thead th { background: transparent; }
+}

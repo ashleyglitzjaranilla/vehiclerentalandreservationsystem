@@ -1,0 +1,123 @@
+{# The vehicle fields, shared by the Add and Edit pages so both validate identically. #}
+
+{% macro errors(field) %}
+  {% for message in field.errors %}
+    <p class="field-error">{{ message }}</p>
+  {% endfor %}
+{% endmacro %}
+
+{% macro invalid(field) %}{% if field.errors %} field-invalid{% endif %}{% endmacro %}
+
+<div class="space-y-7">
+  <fieldset>
+    <legend class="field-label mb-3 !text-base">Vehicle</legend>
+    <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
+      <div>
+        <label class="field-label" for="{{ form.plate_number.id }}">Plate number <span class="text-red-500">*</span></label>
+        {{ form.plate_number(class="field" ~ invalid(form.plate_number), placeholder="ABC 1234", required=true) }}
+        {{ errors(form.plate_number) }}
+        <p class="field-hint">Saved in upper case. Must be unique.</p>
+      </div>
+
+      <div>
+        <label class="field-label" for="{{ form.brand.id }}">Brand <span class="text-red-500">*</span></label>
+        {{ form.brand(class="field" ~ invalid(form.brand), placeholder="Toyota", required=true) }}
+        {{ errors(form.brand) }}
+      </div>
+
+      <div>
+        <label class="field-label" for="{{ form.model.id }}">Model <span class="text-red-500">*</span></label>
+        {{ form.model(class="field" ~ invalid(form.model), placeholder="Hilux", required=true) }}
+        {{ errors(form.model) }}
+      </div>
+
+      <div>
+        <label class="field-label" for="{{ form.year.id }}">Year <span class="text-red-500">*</span></label>
+        {{ form.year(class="field" ~ invalid(form.year), type="number", min=1950, max=max_year, required=true) }}
+        {{ errors(form.year) }}
+      </div>
+
+      <div>
+        <label class="field-label" for="{{ form.vehicle_type.id }}">Type <span class="text-red-500">*</span></label>
+        {{ form.vehicle_type(class="field" ~ invalid(form.vehicle_type)) }}
+        {{ errors(form.vehicle_type) }}
+      </div>
+
+      <div>
+        <label class="field-label" for="{{ form.color.id }}">Color</label>
+        {{ form.color(class="field", placeholder="White") }}
+        {{ errors(form.color) }}
+      </div>
+
+      <div>
+        <label class="field-label" for="{{ form.date_acquired.id }}">Date acquired</label>
+        {{ form.date_acquired(class="field", type="date") }}
+        {{ errors(form.date_acquired) }}
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset class="border-t border-line pt-7">
+    <legend class="field-label mb-3 !text-base">Rental specification</legend>
+    <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
+      <div>
+        <label class="field-label" for="{{ form.seats.id }}">Seats <span class="text-red-500">*</span></label>
+        {{ form.seats(class="field" ~ invalid(form.seats), type="number", min=1, max=30, required=true) }}
+        {{ errors(form.seats) }}
+      </div>
+
+      <div>
+        <label class="field-label" for="{{ form.transmission.id }}">Transmission <span class="text-red-500">*</span></label>
+        {{ form.transmission(class="field" ~ invalid(form.transmission)) }}
+        {{ errors(form.transmission) }}
+      </div>
+
+      <div>
+        <label class="field-label" for="{{ form.fuel_type.id }}">Fuel type <span class="text-red-500">*</span></label>
+        {{ form.fuel_type(class="field" ~ invalid(form.fuel_type)) }}
+        {{ errors(form.fuel_type) }}
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset class="border-t border-line pt-7">
+    <legend class="field-label mb-3 !text-base">Rates and availability</legend>
+    <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
+      <div>
+        <label class="field-label" for="{{ form.daily_rate.id }}">Daily rate (PHP) <span class="text-red-500">*</span></label>
+        {{ form.daily_rate(class="field" ~ invalid(form.daily_rate), type="number", step="0.01", min=0, required=true) }}
+        {{ errors(form.daily_rate) }}
+      </div>
+
+      <div>
+        <label class="field-label" for="{{ form.hourly_rate.id }}">Hourly rate (PHP)</label>
+        {{ form.hourly_rate(class="field" ~ invalid(form.hourly_rate), type="number", step="0.01", min=0) }}
+        {{ errors(form.hourly_rate) }}
+        <p class="field-hint">Leave blank for a daily-only vehicle.</p>
+      </div>
+
+      <div>
+        <label class="field-label" for="{{ form.status.id }}">Status <span class="text-red-500">*</span></label>
+        {{ form.status(class="field" ~ invalid(form.status)) }}
+        {{ errors(form.status) }}
+      </div>
+
+      <div class="sm:col-span-2">
+        <label class="field-label" for="{{ form.image_url.id }}">Image URL</label>
+        {{ form.image_url(class="field", placeholder="https://example.com/photo.jpg") }}
+        {{ errors(form.image_url) }}
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset class="border-t border-line pt-7">
+    <legend class="field-label mb-3 !text-base">Description</legend>
+    <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
+      <div class="sm:col-span-2">
+        <label class="sr-only" for="{{ form.description.id }}">Description</label>
+        {{ form.description(class="field", rows=3, placeholder="Anything worth noting about this vehicle") }}
+        {{ errors(form.description) }}
+      </div>
+    </div>
+  </fieldset>
+</div>
