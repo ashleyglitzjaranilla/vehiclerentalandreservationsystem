@@ -1,0 +1,92 @@
+{% extends 'layout_public.html' %}
+{% from 'partials/_vehicle_card.html' import vehicle_card %}
+{% from 'partials/_pagination.html' import pagination %}
+{% block title %}Browse vehicles &middot; Vehicle Rental{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+  <h1 class="page-title">Browse Vehicles</h1>
+  <p class="mt-1 text-sm text-muted">{{ total }} vehicle{{ '' if total == 1 else 's' }}</p>
+</div>
+
+{# Rate filters arrive as floats (see public.py), but a whole-number rate should
+   echo back without a ".0" tail: a customer who typed "1000" should see "1000",
+   not "1000.0". A non-whole value like 1250.5 is left as Jinja renders it. #}
+{% set min_rate_text = (min_rate | int if min_rate is not none and min_rate == min_rate | int else (min_rate if min_rate is not none else '')) %}
+{% set max_rate_text = (max_rate | int if max_rate is not none and max_rate == max_rate | int else (max_rate if max_rate is not none else '')) %}
+
+{# A plain GET form, so a filtered grid can be bookmarked and shared. #}
+<form method="get" class="card mb-6 p-5">
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-7">
+    <div>
+      <label class="field-label" for="pickup">Pickup</label>
+      <input class="field" type="datetime-local" id="pickup" name="pickup" value="{{ pickup }}">
+    </div>
+    <div>
+      <label class="field-label" for="return">Return</label>
+      <input class="field" type="datetime-local" id="return" name="return" value="{{ return_ }}">
+    </div>
+    <div>
+      <label class="field-label" for="type">Type</label>
+      <select class="field" id="type" name="type">
+        <option value="">All types</option>
+        {% for t in VEHICLE_TYPES %}
+          <option value="{{ t }}" {% if vehicle_type == t %}selected{% endif %}>{{ t }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label class="field-label" for="transmission">Transmission</label>
+      <select class="field" id="transmission" name="transmission">
+        <option value="">All</option>
+        {% for t in TRANSMISSIONS %}
+          <option value="{{ t }}" {% if transmission == t %}selected{% endif %}>{{ t }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label class="field-label" for="seats">Minimum seats</label>
+      <select class="field" id="seats" name="seats">
+        <option value="">Any</option>
+        {% for s in [2, 4, 5, 7, 12, 15] %}
+          <option value="{{ s }}" {% if seats == s %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label class="field-label" for="min_rate">Min rate</label>
+      <input class="field" type="number" id="min_rate" name="min_rate" step="50" min="0"
+             value="{{ min_rate_text }}" placeholder="e.g. 1000">
+    </div>
+    <div>
+      <label class="field-label" for="max_rate">Max rate</label>
+      <input class="field" type="number" id="max_rate" name="max_rate" step="50" min="0"
+             value="{{ max_rate_text }}" placeholder="e.g. 3000">
+    </div>
+  </div>
+  <div class="mt-4 flex gap-2">
+    <button type="submit" class="btn btn-primary">Search Vehicles</button>
+    {% if filtered %}
+      <a class="btn btn-ghost" href="{{ url_for('public.browse') }}">Clear</a>
+    {% endif %}
+  </div>
+</form>
+
+{% set window = ('?pickup=' ~ pickup | urlencode ~ '&return=' ~ return_ | urlencode) if pickup and return_ else '' %}
+
+{% if vehicles %}
+  <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+    {% for vehicle in vehicles %}
+      {{ vehicle_card(vehicle, verdicts.get(vehicle.id), window) }}
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="card p-10 text-center">
+    <p class="text-base font-semibold text-ink">No vehicles match those filters.</p>
+    <p class="mt-1.5 text-sm text-muted">Try widening your price range, or clearing a filter.</p>
+    <a class="btn btn-primary mt-5" href="{{ url_for('public.browse') }}">Show all vehicles</a>
+  </div>
+{% endif %}
+
+{{ pagination(page, total_pages) }}
+{% endblock %}

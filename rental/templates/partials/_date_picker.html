@@ -1,0 +1,36 @@
+{# The pickup/return/extras widget. One definition, used by the detail page and
+   the browse filter bar, so a customer sees the same control in both places.
+
+   `action` is where the form posts or gets. On the detail page it is
+   /book/<id> (POST); on browse it is the browse URL itself (GET). #}
+{% macro date_picker(action, method, vehicle_id, pickup, return_, driver, insurance, submit_label) %}
+<form method="{{ method }}" action="{{ action }}" data-quote-form
+      {% if vehicle_id %}data-vehicle="{{ vehicle_id }}"{% endif %}>
+  {% if method == 'post' %}
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  {% endif %}
+  <div class="grid gap-3 sm:grid-cols-2">
+    <div>
+      <label class="field-label" for="pickup">Pickup</label>
+      <input class="field" type="datetime-local" id="pickup" name="pickup"
+             value="{{ pickup or '' }}" required>
+    </div>
+    <div>
+      <label class="field-label" for="return">Return</label>
+      <input class="field" type="datetime-local" id="return" name="return"
+             value="{{ return_ or '' }}" required>
+    </div>
+  </div>
+  <div class="mt-3 space-y-2 text-sm text-ink">
+    <label class="flex items-center gap-2">
+      <input type="checkbox" name="driver" value="1" {% if driver %}checked{% endif %}>
+      <span>Additional driver</span>
+    </label>
+    <label class="flex items-center gap-2">
+      <input type="checkbox" name="insurance" value="1" {% if insurance %}checked{% endif %}>
+      <span>Insurance</span>
+    </label>
+  </div>
+  <button type="submit" class="btn btn-primary mt-4 w-full">{{ submit_label }}</button>
+</form>
+{% endmacro %}

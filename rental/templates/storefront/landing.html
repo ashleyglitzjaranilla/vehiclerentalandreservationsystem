@@ -1,0 +1,90 @@
+{% extends 'layout_public.html' %}
+{% from 'partials/_icons.html' import icon %}
+{% from 'partials/_vehicle_card.html' import vehicle_card %}
+
+{% block title %}Vehicle Rental and Reservation System{% endblock %}
+
+{% block main %}
+<section class="bg-navy-800 text-white">
+  <div class="mx-auto grid w-full max-w-6xl items-center gap-10 px-4 py-16 sm:px-6 sm:py-24 lg:grid-cols-2 lg:px-8">
+    <div>
+      <h1 class="max-w-2xl text-4xl font-extrabold tracking-tight sm:text-5xl">
+        Rent the Right Vehicle for Your Journey
+      </h1>
+      <p class="mt-4 max-w-xl text-lg text-white/80">
+        Browse available vehicles, check availability, and reserve online.
+      </p>
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a class="btn btn-primary" href="{{ url_for('public.browse') }}">Browse Vehicles</a>
+        <a class="btn btn-ghost" href="{{ url_for('public.browse') }}">Make a Reservation</a>
+      </div>
+      <p class="mt-6 text-sm text-white/70">
+        {{ available_count }} vehicle{{ '' if available_count == 1 else 's' }} available now
+      </p>
+    </div>
+
+    {# Decorative on large screens only: below lg the single column already
+       reads well, and the photo would only push the pitch below the fold. #}
+    <div class="hidden aspect-[4/3] overflow-hidden rounded-2xl lg:block">
+      <picture>
+        <source srcset="{{ url_for('static', filename='img/login-car.webp') }}" type="image/webp">
+        <img src="{{ url_for('static', filename='img/login-car.jpg') }}" alt=""
+             class="h-full w-full object-cover object-[65%_center]">
+      </picture>
+    </div>
+  </div>
+</section>
+
+<div class="mx-auto w-full max-w-6xl p-4 sm:p-6 lg:p-8">
+  {{ flashes() }}
+
+  <section class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="card p-5">
+      <span class="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-500/10 text-brand-500">
+        {{ icon('calendar', 'h-5 w-5') }}
+      </span>
+      <h3 class="mt-4 text-sm font-bold tracking-tight text-ink">Easy Reservation</h3>
+      <p class="mt-1 text-sm text-muted">Reserve a vehicle online in a few steps.</p>
+    </div>
+    <div class="card p-5">
+      <span class="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-500/10 text-brand-500">
+        {{ icon('check', 'h-5 w-5') }}
+      </span>
+      <h3 class="mt-4 text-sm font-bold tracking-tight text-ink">Vehicle Availability</h3>
+      <p class="mt-1 text-sm text-muted">Check whether a vehicle is available for your selected dates.</p>
+    </div>
+    <div class="card p-5">
+      <span class="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-500/10 text-brand-500">
+        {{ icon('money', 'h-5 w-5') }}
+      </span>
+      <h3 class="mt-4 text-sm font-bold tracking-tight text-ink">Automatic Calculation</h3>
+      <p class="mt-1 text-sm text-muted">The system automatically calculates your rental cost.</p>
+    </div>
+    <div class="card p-5">
+      <span class="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-500/10 text-brand-500">
+        {{ icon('wrench', 'h-5 w-5') }}
+      </span>
+      <h3 class="mt-4 text-sm font-bold tracking-tight text-ink">Fleet Management</h3>
+      <p class="mt-1 text-sm text-muted">Administrators can manage vehicles, reservations, rentals, and maintenance.</p>
+    </div>
+  </section>
+
+  {% if featured %}
+  <section class="mt-12">
+    <h2 class="page-title">Starting from our best rates</h2>
+    <div class="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {% for vehicle in featured %}
+        {{ vehicle_card(vehicle) }}
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <section class="mt-12 rounded-2xl bg-slate-50 px-6 py-10 text-center sm:px-10">
+    <p class="text-base font-semibold text-ink sm:text-lg">
+      Online reservation + vehicle availability + automatic rental calculation
+    </p>
+    <a class="btn btn-primary mt-5 inline-flex" href="{{ url_for('public.browse') }}">Browse Vehicles</a>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% from 'partials/_icons.html' import icon %}
+{% from 'partials/_flashes.html' import flashes with context %}
+{% block title %}Create an account &middot; Vehicle Rental{% endblock %}
+
+{# Same full-bleed split as the login page, so moving between the two does not
+   shift the layout. See login.html for the notes on the photograph. #}
+{% block body %}
+<div class="grid min-h-screen lg:grid-cols-2">
+
+  {# ---- Form half ---------------------------------------------------- #}
+  <div class="relative flex items-center justify-center bg-navy-800 px-6 py-14 sm:px-12">
+
+    <div class="absolute inset-0 overflow-hidden lg:hidden" aria-hidden="true">
+      <picture>
+        <source srcset="{{ url_for('static', filename='img/login-car.webp') }}" type="image/webp">
+        <img src="{{ url_for('static', filename='img/login-car.jpg') }}" alt=""
+             class="h-full w-full object-cover object-[65%_center]">
+      </picture>
+      <div class="absolute inset-0 bg-navy-900/85"></div>
+    </div>
+
+    <div class="relative w-full max-w-sm">
+
+      <div class="mb-9 flex items-center gap-3">
+        <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-500 text-white">
+          {{ icon('car', 'h-6 w-6') }}
+        </span>
+      </div>
+
+      <h1 class="text-2xl font-bold text-white">Vehicle Rental and Reservation System</h1>
+      <p class="mt-1.5 text-sm text-slate-400">Book your vehicle online with ease.</p>
+
+      <div class="mt-6">{{ flashes() }}</div>
+
+      <form method="post" class="mt-6 space-y-4">
+        {{ form.hidden_tag() }}
+
+        <div>
+          <label class="mb-1.5 block text-sm font-medium text-slate-200"
+                 for="{{ form.full_name.id }}">Full name</label>
+          {{ form.full_name(class="field border-transparent", autofocus=true,
+                            autocomplete="name", placeholder="Maria Santos") }}
+          {% for message in form.full_name.errors %}
+            <p class="mt-1.5 text-xs font-medium text-red-300">{{ message }}</p>
+          {% endfor %}
+        </div>
+
+        <div>
+          <label class="mb-1.5 block text-sm font-medium text-slate-200"
+                 for="{{ form.username.id }}">Username</label>
+          {{ form.username(class="field border-transparent",
+                           required=true, autocomplete="username",
+                           placeholder="j.santos") }}
+          {% for message in form.username.errors %}
+            <p class="mt-1.5 text-xs font-medium text-red-300">{{ message }}</p>
+          {% endfor %}
+        </div>
+
+        <div>
+          <label class="mb-1.5 block text-sm font-medium text-slate-200"
+                 for="{{ form.email.id }}">Email</label>
+          {{ form.email(class="field border-transparent", type="email", required=true,
+                        autocomplete="email", placeholder="you@example.com") }}
+          {% for message in form.email.errors %}
+            <p class="mt-1.5 text-xs font-medium text-red-300">{{ message }}</p>
+          {% endfor %}
+        </div>
+
+        <div>
+          <label class="mb-1.5 block text-sm font-medium text-slate-200"
+                 for="{{ form.phone.id }}">Phone</label>
+          {{ form.phone(class="field border-transparent", type="tel",
+                        autocomplete="tel", placeholder="0917 555 0101") }}
+          {% for message in form.phone.errors %}
+            <p class="mt-1.5 text-xs font-medium text-red-300">{{ message }}</p>
+          {% endfor %}
+        </div>
+
+        <div>
+          <label class="mb-1.5 block text-sm font-medium text-slate-200"
+                 for="{{ form.password.id }}">Password</label>
+          {{ form.password(class="field border-transparent", required=true,
+                           autocomplete="new-password", placeholder="••••••••") }}
+          {% if form.password.errors %}
+            {% for message in form.password.errors %}
+              <p class="mt-1.5 text-xs font-medium text-red-300">{{ message }}</p>
+            {% endfor %}
+          {% else %}
+            <p class="mt-1.5 text-xs text-slate-400">At least 8 characters.</p>
+          {% endif %}
+        </div>
+
+        <div>
+          <label class="mb-1.5 block text-sm font-medium text-slate-200"
+                 for="{{ form.confirm_password.id }}">Confirm password</label>
+          {{ form.confirm_password(class="field border-transparent", required=true,
+                                   autocomplete="new-password", placeholder="••••••••") }}
+          {% for message in form.confirm_password.errors %}
+            <p class="mt-1.5 text-xs font-medium text-red-300">{{ message }}</p>
+          {% endfor %}
+        </div>
+
+        {{ form.submit(class="btn btn-primary w-full !py-3") }}
+      </form>
+
+      <p class="mt-6 text-center text-sm text-slate-400">
+        Already have an account?
+        <a href="{{ url_for('auth.login') }}"
+           class="font-semibold text-white underline decoration-brand-500 decoration-2 underline-offset-4 hover:text-slate-200">Sign in</a>
+      </p>
+    </div>
+  </div>
+
+  {# ---- Photo half -------------------------------------------------- #}
+  <div class="relative hidden lg:block">
+    <picture>
+      <source srcset="{{ url_for('static', filename='img/login-car.webp') }}" type="image/webp">
+      <img src="{{ url_for('static', filename='img/login-car.jpg') }}" alt=""
+           class="absolute inset-0 h-full w-full object-cover object-[65%_center]">
+    </picture>
+
+    <div class="absolute inset-0 bg-gradient-to-t from-navy-900 via-navy-900/45 to-navy-900/10"></div>
+
+    <div class="absolute inset-x-0 bottom-0 p-12">
+      <p class="text-3xl font-bold leading-tight tracking-tight text-white">
+        Join in a minute,<br>book anytime.
+      </p>
+      <p class="mt-3 max-w-sm text-sm leading-relaxed text-slate-300">
+        Create an account to save your details and book your next rental in minutes.
+      </p>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

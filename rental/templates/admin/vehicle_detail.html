@@ -1,0 +1,82 @@
+{% extends 'layout_admin.html' %}
+{% from 'partials/_icons.html' import icon %}
+{% block title %}{{ vehicle.plate_number }} &middot; Vehicle Rental{% endblock %}
+
+{# The read-only view of one vehicle. This is the only page that shows the
+   description and the acquisition date without opening the edit form. #}
+{% block content %}
+<div class="mb-6 flex flex-wrap items-end justify-between gap-3">
+  <div>
+    <p class="text-xs font-semibold uppercase tracking-wider text-muted">Vehicle</p>
+    <h1 class="page-title font-mono">{{ vehicle.plate_number }}</h1>
+    <p class="mt-1 text-sm text-muted">{{ vehicle.year }} {{ vehicle.brand }} {{ vehicle.model }}</p>
+  </div>
+  <div class="no-print flex flex-wrap items-center gap-2">
+    <a class="btn btn-ghost" href="{{ url_for('admin_fleet.list_vehicles') }}">Back to vehicles</a>
+    <a class="btn btn-ghost" href="{{ url_for('public.vehicle_detail', vehicle_id=vehicle.id) }}">View as a customer</a>
+    {% if is_admin %}
+      <a class="btn btn-primary" href="{{ url_for('admin_fleet.edit_vehicle', vehicle_id=vehicle.id) }}">Edit</a>
+      <a class="btn btn-ghost text-red-600 hover:bg-red-50"
+         href="{{ url_for('admin_fleet.delete_vehicle', vehicle_id=vehicle.id) }}">Delete</a>
+      <form method="post" action="{{ url_for('admin_fleet.toggle_active', vehicle_id=vehicle.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn {% if vehicle.is_active %}btn-ghost{% else %}btn-success{% endif %}">
+          {% if vehicle.is_active %}Disable vehicle{% else %}Re-enable vehicle{% endif %}
+        </button>
+      </form>
+    {% endif %}
+  </div>
+</div>
+
+{% if is_admin %}
+  <p class="field-hint no-print -mt-3 mb-6">
+    A disabled vehicle leaves the storefront and cannot be booked. Its record and history are kept.
+  </p>
+{% endif %}
+
+<div class="card overflow-hidden">
+  <header class="flex items-center justify-between border-b border-line px-5 py-4">
+    <h2 class="font-semibold text-ink">Details</h2>
+    <div class="flex items-center gap-2">
+      <span class="pill {{ vehicle.badge_class }}">{{ vehicle.status }}</span>
+      {% if not vehicle.is_active %}<span class="pill pill-red">DISABLED</span>{% endif %}
+    </div>
+  </header>
+
+  <dl class="grid gap-x-8 gap-y-5 px-5 py-6 sm:grid-cols-2">
+    {% set fields = [
+      ('Plate number', vehicle.plate_number),
+      ('Brand',        vehicle.brand),
+      ('Model',        vehicle.model),
+      ('Year',         vehicle.year),
+      ('Type',         vehicle.vehicle_type),
+      ('Color',        vehicle.color),
+      ('Seats',        vehicle.seats),
+      ('Transmission', vehicle.transmission),
+      ('Fuel type',    vehicle.fuel_type),
+      ('Daily rate',   "₱" ~ '{:,.2f}'.format(vehicle.daily_rate)),
+      ('Hourly rate',  ("₱" ~ '{:,.2f}'.format(vehicle.hourly_rate)) if vehicle.hourly_rate is not none else None),
+      ('Image URL',    vehicle.image_url),
+      ('Date acquired', vehicle.date_acquired.strftime('%d %b %Y') if vehicle.date_acquired else None)
+    ] %}
+    {% for label, value in fields %}
+      <div>
+        <dt class="text-xs font-semibold uppercase tracking-wider text-muted">{{ label }}</dt>
+        <dd class="mt-1 text-sm font-medium text-ink">{{ value if value is not none and value != '' else '—' }}</dd>
+      </div>
+    {% endfor %}
+  </dl>
+
+  <div class="border-t border-line px-5 py-6">
+    <dt class="text-xs font-semibold uppercase tracking-wider text-muted">Description</dt>
+    {# Description is free text and may run to several lines, so the whitespace
+       is preserved rather than collapsed into one paragraph. #}
+    <dd class="mt-1 whitespace-pre-line text-sm text-ink">{{ vehicle.description or '—' }}</dd>
+  </div>
+
+  <div class="border-t border-line bg-slate-50 px-5 py-3 text-xs text-muted">
+    Added {{ vehicle.created_at.strftime('%d %b %Y') }} &middot;
+    last updated {{ vehicle.updated_at.strftime('%d %b %Y') }}
+  </div>
+</div>
+{% endblock %}

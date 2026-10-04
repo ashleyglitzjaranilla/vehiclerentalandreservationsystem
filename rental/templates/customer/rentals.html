@@ -1,0 +1,53 @@
+{% extends 'layout_public.html' %}
+{% block title %}My rentals &middot; Vehicle Rental{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+  <h1 class="page-title">My Rentals</h1>
+  <p class="mt-1 text-sm text-muted">
+    {{ rentals | length }} rental{{ '' if rentals | length == 1 else 's' }}
+  </p>
+</div>
+
+{% if rentals %}
+  <div class="card overflow-hidden">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="border-b border-line text-left">
+          <th class="p-4 stat-label">Reference</th>
+          <th class="p-4 stat-label">Vehicle</th>
+          <th class="p-4 stat-label">Collected</th>
+          <th class="p-4 stat-label">Due back</th>
+          <th class="p-4 stat-label">Total</th>
+          <th class="p-4 stat-label">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for rental, vehicle in rentals %}
+          <tr class="border-b border-line last:border-0">
+            <td class="p-4">
+              <a class="font-semibold text-ink underline"
+                 href="{{ url_for('portal.rental_detail', rental_id=rental.id) }}">
+                {{ rental.rental_number }}
+              </a>
+            </td>
+            <td class="p-4">{{ vehicle.display_name }}</td>
+            <td class="p-4">{{ rental.actual_pickup.strftime('%d %b %Y, %I:%M %p') }}</td>
+            <td class="p-4">{{ rental.expected_return.strftime('%d %b %Y, %I:%M %p') }}</td>
+            <td class="p-4 font-semibold">₱{{ '{:,.2f}'.format(rental.total_amount) }}</td>
+            <td class="p-4"><span class="pill {{ rental.badge_class }}">{{ rental.status }}</span></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <div class="card p-10 text-center">
+    <p class="text-base font-semibold text-ink">No rentals yet</p>
+    <p class="mt-1.5 text-sm text-muted">
+      A rental appears here once you collect a vehicle you have booked.
+    </p>
+    <a class="btn btn-primary mt-5" href="{{ url_for('portal.reservations') }}">My Reservations</a>
+  </div>
+{% endif %}
+{% endblock %}

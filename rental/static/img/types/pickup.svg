@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 90" role="img" aria-label="Pickup">
+  <path fill="#cbd5e1" d="M18 58V46L34 26H60V44H134V58Z"/>
+  <path fill="#94a3b8" d="M38 30h18v10H30Z"/>
+  <circle cx="38" cy="58" r="11" fill="#94a3b8"/><circle cx="38" cy="58" r="5" fill="#f1f5f9"/>
+  <circle cx="112" cy="58" r="11" fill="#94a3b8"/><circle cx="112" cy="58" r="5" fill="#f1f5f9"/>
+</svg>

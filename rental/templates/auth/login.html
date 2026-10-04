@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% from 'partials/_icons.html' import icon %}
+{% from 'partials/_flashes.html' import flashes with context %}
+{% block title %}Log in &middot; Vehicle Rental{% endblock %}
+
+{# Full-bleed split: the form owns one half of the window, the photograph the
+   other. Overrides `main` so it escapes the usual centred content column. #}
+{% block body %}
+<div class="grid min-h-screen lg:grid-cols-2">
+
+  {# ---- Form half ---------------------------------------------------- #}
+  <div class="relative flex items-center justify-center bg-navy-800 px-6 py-14 sm:px-12">
+
+    {# Below lg there is no second column, so the photo sits behind the form
+       instead, dimmed enough to keep the labels and inputs readable. #}
+    <div class="absolute inset-0 overflow-hidden lg:hidden" aria-hidden="true">
+      <picture>
+        <source srcset="{{ url_for('static', filename='img/login-car.webp') }}" type="image/webp">
+        <img src="{{ url_for('static', filename='img/login-car.jpg') }}" alt=""
+             class="h-full w-full object-cover object-[65%_center]">
+      </picture>
+      <div class="absolute inset-0 bg-navy-900/85"></div>
+    </div>
+
+    <div class="relative w-full max-w-sm">
+
+      <div class="mb-9 flex items-center gap-3">
+        <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-500 text-white">
+          {{ icon('car', 'h-6 w-6') }}
+        </span>
+      </div>
+
+      <h1 class="text-2xl font-bold text-white">Vehicle Rental and Reservation System</h1>
+      <p class="mt-1.5 text-sm text-slate-400">Book your vehicle online with ease.</p>
+
+      <div class="mt-6">{{ flashes() }}</div>
+
+      <form method="post" class="mt-6 space-y-4">
+        {{ form.hidden_tag() }}
+
+        <div>
+          <label class="mb-1.5 block text-sm font-medium text-slate-200"
+                 for="{{ form.username.id }}">Username</label>
+          {{ form.username(class="field border-transparent", autofocus=true,
+                           required=true, placeholder="admin") }}
+          {% for message in form.username.errors %}
+            <p class="mt-1.5 text-xs font-medium text-red-300">{{ message }}</p>
+          {% endfor %}
+        </div>
+
+        <div>
+          <label class="mb-1.5 block text-sm font-medium text-slate-200"
+                 for="{{ form.password.id }}">Password</label>
+          {{ form.password(class="field border-transparent", required=true,
+                           placeholder="••••••••") }}
+          {% for message in form.password.errors %}
+            <p class="mt-1.5 text-xs font-medium text-red-300">{{ message }}</p>
+          {% endfor %}
+        </div>
+
+        {{ form.submit(class="btn btn-primary w-full !py-3") }}
+      </form>
+
+      <div class="mt-3 space-y-2">
+        <a class="btn btn-ghost w-full" href="{{ url_for('auth.signup') }}">Create Account</a>
+        <a class="btn btn-ghost w-full" href="{{ url_for('public.browse') }}">Browse Vehicles</a>
+      </div>
+
+      <p class="mt-6 text-center text-sm text-slate-400">
+        <a href="{{ url_for('auth.forgot_password') }}"
+           class="font-semibold text-white underline decoration-brand-500 decoration-2 underline-offset-4 hover:text-slate-200">Forgot password?</a>
+      </p>
+    </div>
+  </div>
+
+  {# ---- Photo half. Hidden on small screens, where it would push the form
+         below the fold. Decorative, so the alt text is empty. ---------- #}
+  <div class="relative hidden lg:block">
+    <picture>
+      <source srcset="{{ url_for('static', filename='img/login-car.webp') }}" type="image/webp">
+      <img src="{{ url_for('static', filename='img/login-car.jpg') }}" alt=""
+           class="absolute inset-0 h-full w-full object-cover object-[65%_center]">
+    </picture>
+
+    {# Darkens the lower half so the caption stays readable over the photo. #}
+    <div class="absolute inset-0 bg-gradient-to-t from-navy-900 via-navy-900/45 to-navy-900/10"></div>
+
+    <div class="absolute inset-x-0 bottom-0 p-12">
+      <p class="text-3xl font-bold leading-tight tracking-tight text-white">
+        Book your ride,<br>drive today.
+      </p>
+      <p class="mt-3 max-w-sm text-sm leading-relaxed text-slate-300">
+        Browse the fleet, compare rates and reserve your next rental online.
+      </p>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

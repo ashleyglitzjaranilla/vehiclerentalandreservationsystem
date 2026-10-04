@@ -1,0 +1,51 @@
+{% extends 'layout_public.html' %}
+{% block title %}My reservations &middot; Vehicle Rental{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+  <h1 class="page-title">My Reservations</h1>
+  <p class="mt-1 text-sm text-muted">
+    {{ reservations | length }} reservation{{ '' if reservations | length == 1 else 's' }}
+  </p>
+</div>
+
+{% if reservations %}
+  <div class="card overflow-hidden">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="border-b border-line text-left">
+          <th class="p-4 stat-label">Reference</th>
+          <th class="p-4 stat-label">Vehicle</th>
+          <th class="p-4 stat-label">Pickup</th>
+          <th class="p-4 stat-label">Return</th>
+          <th class="p-4 stat-label">Total</th>
+          <th class="p-4 stat-label">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for reservation, vehicle in reservations %}
+          <tr class="border-b border-line last:border-0">
+            <td class="p-4">
+              <a class="font-semibold text-ink underline"
+                 href="{{ url_for('portal.reservation_detail', reservation_id=reservation.id) }}">
+                {{ reservation.reservation_number }}
+              </a>
+            </td>
+            <td class="p-4">{{ vehicle.display_name }}</td>
+            <td class="p-4">{{ reservation.pickup_at.strftime('%d %b %Y, %I:%M %p') }}</td>
+            <td class="p-4">{{ reservation.return_at.strftime('%d %b %Y, %I:%M %p') }}</td>
+            <td class="p-4 font-semibold">₱{{ '{:,.2f}'.format(reservation.total_amount) }}</td>
+            <td class="p-4"><span class="pill {{ reservation.badge_class }}">{{ reservation.status }}</span></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <div class="card p-10 text-center">
+    <p class="text-base font-semibold text-ink">No reservations yet</p>
+    <p class="mt-1.5 text-sm text-muted">Pick your dates on any vehicle and book it online.</p>
+    <a class="btn btn-primary mt-5" href="{{ url_for('public.browse') }}">Browse Vehicles</a>
+  </div>
+{% endif %}
+{% endblock %}
