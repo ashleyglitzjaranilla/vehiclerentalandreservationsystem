@@ -29,6 +29,30 @@ STATUS_BADGES = {
     "MAINTENANCE": "pill-slate",
 }
 
+SEEDED_VEHICLE_IMAGES = {
+    "ABC 1234": "sedan.webp",
+    "XYZ 5678": "hatchback.webp",
+    "JKL 2468": "innova.webp",
+    "MNO 1357": "van.webp",
+    "PQR 8642": "civic.webp",
+    "STU 9753": "suv.webp",
+    "VWX 3141": "ranger.webp",
+    "YZA 5926": "ertiga.webp",
+    "BCD 5358": "urvan.webp",
+    "EFG 9793": "accent.webp",
+}
+
+TYPE_FALLBACK_IMAGES = {
+    "sedan": "sedan.webp",
+    "hatchback": "hatchback.webp",
+    "mpv": "innova.webp",
+    "suv": "suv.webp",
+    "pickup": "ranger.webp",
+    "van": "van.webp",
+    "truck": "ranger.webp",
+    "motorcycle": "hatchback.webp",
+}
+
 
 class Base(DeclarativeBase):
     """Base class every model inherits from."""
@@ -123,6 +147,14 @@ class Vehicle(Base):
     def type_slug(self) -> str:
         """The vehicle type lower-cased, which is the silhouette's filename."""
         return (self.vehicle_type or "sedan").lower()
+
+    @property
+    def fallback_image(self) -> str:
+        """Return a unique demo photo, or the closest body-style photo."""
+        return SEEDED_VEHICLE_IMAGES.get(
+            self.plate_number,
+            TYPE_FALLBACK_IMAGES.get(self.type_slug, "sedan.webp"),
+        )
 
     def __repr__(self) -> str:
         return f"<Vehicle {self.plate_number} {self.brand} {self.model}>"

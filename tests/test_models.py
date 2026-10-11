@@ -133,6 +133,17 @@ def test_a_new_vehicle_defaults_to_available_and_active(app):
         assert vehicle.fuel_type == "Gasoline"
 
 
+def test_seeded_vehicles_have_unique_photos_and_new_vehicles_use_a_type_fallback():
+    plates = (
+        "ABC 1234", "XYZ 5678", "JKL 2468", "MNO 1357", "PQR 8642",
+        "STU 9753", "VWX 3141", "YZA 5926", "BCD 5358", "EFG 9793",
+    )
+    seeded = [Vehicle(plate_number=plate, vehicle_type="Sedan") for plate in plates]
+
+    assert len({vehicle.fallback_image for vehicle in seeded}) == 10
+    assert Vehicle(plate_number="NEW 0001", vehicle_type="Pickup").fallback_image == "ranger.webp"
+
+
 def test_the_new_tables_are_created(app):
     from sqlalchemy import inspect
 
