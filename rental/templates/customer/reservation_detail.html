@@ -30,6 +30,22 @@
         <dd class="text-sm font-semibold text-ink">{{ reservation.return_location or '—' }}</dd>
       </div>
       <div>
+        <dt class="stat-label">Renter</dt>
+        <dd class="text-sm font-semibold text-ink">{{ reservation.renter_full_name or current_user.display_name }}</dd>
+      </div>
+      <div>
+        <dt class="stat-label">Phone</dt>
+        <dd class="text-sm font-semibold text-ink">{{ reservation.renter_phone or '—' }}</dd>
+      </div>
+      <div>
+        <dt class="stat-label">Home address</dt>
+        <dd class="text-sm font-semibold text-ink">{{ reservation.renter_address or '—' }}</dd>
+      </div>
+      <div>
+        <dt class="stat-label">Driver's license</dt>
+        <dd class="text-sm font-semibold text-ink">{{ reservation.driver_license_number or '—' }}</dd>
+      </div>
+      <div>
         <dt class="stat-label">Duration</dt>
         <dd class="text-sm font-semibold text-ink">
           {{ reservation.rental_hours }} hour(s) &middot; {{ reservation.rental_days }} billable day(s)

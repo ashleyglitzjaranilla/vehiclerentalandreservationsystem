@@ -4,7 +4,12 @@
 {% macro row(reservation, user, vehicle, actionable) %}
 <tr class="border-b border-line last:border-0">
   <td class="p-4 font-semibold text-ink">{{ reservation.reservation_number }}</td>
-  <td class="p-4">{{ user.display_name }}</td>
+  <td class="p-4">
+    <span class="font-semibold text-ink">{{ reservation.renter_full_name or user.display_name }}</span>
+    {% if reservation.renter_phone %}<span class="block text-xs text-muted">{{ reservation.renter_phone }}</span>{% endif %}
+    {% if reservation.renter_address %}<span class="block text-xs text-muted">{{ reservation.renter_address }}</span>{% endif %}
+    {% if reservation.driver_license_number %}<span class="block text-xs text-muted">License: {{ reservation.driver_license_number }}</span>{% endif %}
+  </td>
   <td class="p-4">{{ vehicle.display_name }}</td>
   <td class="p-4">{{ reservation.pickup_at.strftime('%d %b %Y, %I:%M %p') }}</td>
   <td class="p-4">{{ reservation.return_at.strftime('%d %b %Y, %I:%M %p') }}</td>

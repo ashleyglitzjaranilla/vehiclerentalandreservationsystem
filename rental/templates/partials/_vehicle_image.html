@@ -1,4 +1,4 @@
-{# A vehicle's photograph, or the silhouette for its body style when it has none.
+{# A vehicle's photograph, or a local fleet photo for its body style when it has none.
    Kept in one macro so the browse grid, the detail page and the admin table all
    fall back identically. #}
 
@@ -6,7 +6,17 @@
   {% if vehicle.image_url %}
     <img src="{{ vehicle.image_url }}" alt="{{ vehicle.display_name }}" class="{{ cls }}" loading="lazy">
   {% else %}
-    <img src="{{ url_for('static', filename='img/types/' ~ vehicle.type_slug ~ '.svg') }}"
-         alt="{{ vehicle.vehicle_type }} illustration" class="h-3/5 w-3/5 object-contain opacity-80">
+    {% set photo = {
+      'sedan': 'sedan.webp',
+      'hatchback': 'hatchback.webp',
+      'mpv': 'suv.webp',
+      'suv': 'suv.webp',
+      'pickup': 'suv.webp',
+      'van': 'van.webp',
+      'truck': 'van.webp',
+      'motorcycle': 'hatchback.webp'
+    }.get(vehicle.type_slug, 'sedan.webp') %}
+    <img src="{{ url_for('static', filename='img/vehicles/' ~ photo) }}"
+         alt="{{ vehicle.display_name }}" class="{{ cls }}" loading="lazy">
   {% endif %}
 {% endmacro %}

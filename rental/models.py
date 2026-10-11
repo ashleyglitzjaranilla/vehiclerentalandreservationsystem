@@ -206,6 +206,14 @@ class Reservation(Base):
     pickup_location: Mapped[str | None] = mapped_column(String(120), nullable=True)
     return_location: Mapped[str | None] = mapped_column(String(120), nullable=True)
 
+    # Contact and licence details are copied onto the reservation rather than
+    # read from the user's profile later.  This preserves exactly what the
+    # customer submitted even when they subsequently edit their profile.
+    renter_full_name: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    renter_phone: Mapped[str | None] = mapped_column(String(30), nullable=True)
+    renter_address: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    driver_license_number: Mapped[str | None] = mapped_column(String(60), nullable=True)
+
     want_additional_driver: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     want_insurance: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 

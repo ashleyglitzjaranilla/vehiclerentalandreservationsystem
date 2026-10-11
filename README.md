@@ -309,6 +309,17 @@ export.
      uv run flask --app app init-db
    ```
 
+   If the database was created by an older version of the project, apply the
+   non-destructive schema updates before redeploying:
+
+   ```bash
+   DATABASE_URL='postgresql://...-pooler.../neondb?sslmode=require' \
+     uv run flask --app app migrate-db
+   ```
+
+   `migrate-db` is idempotent: it adds only missing reservation-detail columns
+   and reports that the database is up to date when run again.
+
 `requirements.txt` is generated with
 `uv export --no-hashes --no-dev > requirements.txt` and committed as a fallback
 for hosts that do not read `uv.lock`.

@@ -73,7 +73,15 @@ def test_a_booking_travels_from_browse_to_a_completed_late_rental(
     # 3. The signed-in customer confirms it.
     customer_client.post(
         f"/book/{fleet}/confirm",
-        data=dict(window, pickup_location="Main office", return_location="Main office"),
+        data=dict(
+            window,
+            renter_full_name="Maria Santos",
+            renter_phone="0917 555 0101",
+            renter_address="123 Rizal Street, Cebu City",
+            driver_license_number="N01-23-456789",
+            pickup_location="Main office",
+            return_location="Main office",
+        ),
     )
     with app.app_context():
         reservation = get_session().query(Reservation).one()

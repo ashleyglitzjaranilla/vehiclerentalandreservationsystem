@@ -14,7 +14,7 @@ from urllib.parse import urlparse
 import click
 from flask import Flask, current_app
 from flask.cli import with_appcontext
-from sqlalchemy import select
+from sqlalchemy import inspect, select, text
 
 from .clock import today
 from .db import get_engine, get_session
@@ -49,6 +49,7 @@ def register_cli(app: Flask) -> None:
     app.cli.add_command(create_admin_command)
     app.cli.add_command(seed_command)
     app.cli.add_command(reset_db_command)
+    app.cli.add_command(migrate_db_command)
 
 
 @click.command("init-db")
@@ -57,6 +58,33 @@ def init_db_command():
     """Create every table if it does not exist yet."""
     Base.metadata.create_all(get_engine())
     click.echo("Tables created.")
+
+
+@click.command("migrate-db")
+@with_appcontext
+def migrate_db_command():
+    """Add columns introduced after the first production database was created.
+
+    ``create_all`` does not alter existing tables. This small, idempotent
+    migration keeps the project deployable without adding a migration
+    framework for its handful of schema changes.
+    """
+    engine = get_engine()
+    existing = {column["name"] for column in inspect(engine).get_columns("reservations")}
+    columns = {
+        "renter_full_name": "VARCHAR(120)",
+        "renter_phone": "VARCHAR(30)",
+        "renter_address": "VARCHAR(255)",
+        "driver_license_number": "VARCHAR(60)",
+    }
+    added = []
+    with engine.begin() as connection:
+        for name, sql_type in columns.items():
+            if name in existing:
+                continue
+            connection.execute(text(f"ALTER TABLE reservations ADD COLUMN {name} {sql_type}"))
+            added.append(name)
+    click.echo("Added: " + ", ".join(added) if added else "Database is already up to date.")
 
 
 @click.command("create-admin")

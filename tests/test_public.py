@@ -70,9 +70,9 @@ def test_vehicle_detail_shows_the_rental_facts(client, sample_vehicle):
     assert b"Diesel" in response.data
 
 
-def test_a_vehicle_without_a_photo_falls_back_to_its_type_silhouette(client, sample_vehicle):
+def test_a_vehicle_without_a_photo_falls_back_to_a_local_fleet_photo(client, sample_vehicle):
     response = client.get(f"/vehicles/{sample_vehicle}")
-    assert b"img/types/pickup.svg" in response.data
+    assert b"img/vehicles/suv.webp" in response.data
 
 
 def test_a_vehicle_with_a_photo_uses_it(app, client, sample_vehicle):

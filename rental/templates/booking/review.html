@@ -51,16 +51,54 @@
         {% if driver %}<input type="hidden" name="driver" value="1">{% endif %}
         {% if insurance %}<input type="hidden" name="insurance" value="1">{% endif %}
 
+        <fieldset>
+          <legend class="mb-3 text-sm font-bold tracking-tight text-ink">Renter requirements</legend>
+          <div>
+            <label class="field-label" for="renter_full_name">Full name <span class="text-red-500">*</span></label>
+            <input class="field{{ ' field-invalid' if errors.renter_full_name }}" id="renter_full_name"
+                   name="renter_full_name" maxlength="120" autocomplete="name"
+                   value="{{ details.renter_full_name }}" required>
+            {% if errors.renter_full_name %}<p class="field-error">{{ errors.renter_full_name }}</p>{% endif %}
+          </div>
+          <div class="mt-3">
+            <label class="field-label" for="renter_phone">Phone number <span class="text-red-500">*</span></label>
+            <input class="field{{ ' field-invalid' if errors.renter_phone }}" id="renter_phone"
+                   name="renter_phone" maxlength="30" autocomplete="tel"
+                   value="{{ details.renter_phone }}" required>
+            {% if errors.renter_phone %}<p class="field-error">{{ errors.renter_phone }}</p>{% endif %}
+          </div>
+          <div class="mt-3">
+            <label class="field-label" for="renter_address">Home address <span class="text-red-500">*</span></label>
+            <textarea class="field{{ ' field-invalid' if errors.renter_address }}" id="renter_address"
+                      name="renter_address" maxlength="255" rows="3" autocomplete="street-address"
+                      placeholder="House no., street, barangay, city/municipality" required>{{ details.renter_address }}</textarea>
+            {% if errors.renter_address %}<p class="field-error">{{ errors.renter_address }}</p>{% endif %}
+          </div>
+          <div class="mt-3">
+            <label class="field-label" for="driver_license_number">Driver's license number <span class="text-red-500">*</span></label>
+            <input class="field{{ ' field-invalid' if errors.driver_license_number }}" id="driver_license_number"
+                   name="driver_license_number" maxlength="60" autocomplete="off"
+                   placeholder="e.g. N01-23-456789" value="{{ details.driver_license_number }}" required>
+            {% if errors.driver_license_number %}<p class="field-error">{{ errors.driver_license_number }}</p>{% endif %}
+            <p class="field-hint">Bring the original valid license when collecting the vehicle.</p>
+          </div>
+        </fieldset>
+
+        <fieldset class="mt-5 border-t border-line pt-4">
+          <legend class="mb-3 text-sm font-bold tracking-tight text-ink">Collection details</legend>
         <div>
           <label class="field-label" for="pickup_location">Pickup location</label>
-          <input class="field" id="pickup_location" name="pickup_location" maxlength="120"
-                 value="Main office" required>
+          <input class="field{{ ' field-invalid' if errors.pickup_location }}" id="pickup_location" name="pickup_location" maxlength="120"
+                 value="{{ details.pickup_location }}" required>
+          {% if errors.pickup_location %}<p class="field-error">{{ errors.pickup_location }}</p>{% endif %}
         </div>
         <div class="mt-3">
           <label class="field-label" for="return_location">Return location</label>
-          <input class="field" id="return_location" name="return_location" maxlength="120"
-                 value="Main office" required>
+          <input class="field{{ ' field-invalid' if errors.return_location }}" id="return_location" name="return_location" maxlength="120"
+                 value="{{ details.return_location }}" required>
+          {% if errors.return_location %}<p class="field-error">{{ errors.return_location }}</p>{% endif %}
         </div>
+        </fieldset>
 
         <p class="mt-4 text-xs text-muted">
           Payment status: Pending. Settle at the counter when you collect the vehicle.

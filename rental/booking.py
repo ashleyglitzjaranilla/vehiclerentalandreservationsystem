@@ -25,6 +25,29 @@ from .models import Reservation, Vehicle
 
 bp = Blueprint("booking", __name__)
 
+REQUIRED_RESERVATION_FIELDS = {
+    "renter_full_name": ("Full name", 120),
+    "renter_phone": ("Phone number", 30),
+    "renter_address": ("Home address", 255),
+    "driver_license_number": ("Driver's license number", 60),
+    "pickup_location": ("Pickup location", 120),
+    "return_location": ("Return location", 120),
+}
+
+
+def reservation_details_from_form():
+    """Return cleaned reservation requirements and any validation errors."""
+    details = {}
+    errors = {}
+    for field, (label, maximum) in REQUIRED_RESERVATION_FIELDS.items():
+        value = request.form.get(field, "").strip()
+        details[field] = value
+        if not value:
+            errors[field] = f"{label} is required."
+        elif len(value) > maximum:
+            errors[field] = f"{label} must be {maximum} characters or fewer."
+    return details, errors
+
 
 def wants(name: str) -> bool:
     """Read a checkbox from the query string or the form.
@@ -171,6 +194,15 @@ def review(vehicle_id: int):
         return_=request.args.get("return", ""),
         driver=wants("driver"),
         insurance=wants("insurance"),
+        details={
+            "renter_full_name": current_user().full_name or "",
+            "renter_phone": current_user().phone or "",
+            "renter_address": "",
+            "driver_license_number": "",
+            "pickup_location": "Main office",
+            "return_location": "Main office",
+        },
+        errors={},
     )
 
 
@@ -188,6 +220,32 @@ def confirm(vehicle_id: int):
     interval, bail = window_from_request(vehicle_id)
     if bail is not None:
         return bail
+
+    details, errors = reservation_details_from_form()
+    if errors:
+        db = get_session()
+        verdict = scheduling.availability_for(db, vehicle, interval)
+        if not verdict.ok:
+            flash(verdict.message, "warning")
+            return redirect(url_for("public.vehicle_detail", vehicle_id=vehicle_id))
+        return render_template(
+            "booking/review.html",
+            vehicle=vehicle,
+            interval=interval,
+            quote=scheduling.quote_for(
+                db,
+                vehicle,
+                interval,
+                want_additional_driver=wants("driver"),
+                want_insurance=wants("insurance"),
+            ),
+            pickup=request.form.get("pickup", ""),
+            return_=request.form.get("return", ""),
+            driver=wants("driver"),
+            insurance=wants("insurance"),
+            details=details,
+            errors=errors,
+        ), 400
 
     db = get_session()
     # Serialises booking attempts for this one vehicle. Postgres honours the
@@ -226,8 +284,12 @@ def confirm(vehicle_id: int):
         vehicle_id=vehicle.id,
         pickup_at=interval.start,
         return_at=interval.end,
-        pickup_location=request.form.get("pickup_location", "").strip() or None,
-        return_location=request.form.get("return_location", "").strip() or None,
+        pickup_location=details["pickup_location"],
+        return_location=details["return_location"],
+        renter_full_name=details["renter_full_name"],
+        renter_phone=details["renter_phone"],
+        renter_address=details["renter_address"],
+        driver_license_number=details["driver_license_number"],
         want_additional_driver=driver,
         want_insurance=insurance,
         rental_hours=priced.duration.hours,

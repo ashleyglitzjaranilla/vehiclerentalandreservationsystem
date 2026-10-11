@@ -122,7 +122,16 @@ def test_api_quote_404s_on_a_disabled_vehicle(client, vehicle_id, app):
 
 
 def window(**extra) -> dict:
-    data = {"pickup": JAN10, "return": JAN12}
+    data = {
+        "pickup": JAN10,
+        "return": JAN12,
+        "renter_full_name": "Maria Santos",
+        "renter_phone": "0917 555 0101",
+        "renter_address": "123 Rizal Street, Barangay Centro, Cebu City",
+        "driver_license_number": "N01-23-456789",
+        "pickup_location": "Main office",
+        "return_location": "Main office",
+    }
     data.update(extra)
     return data
 
@@ -190,7 +199,25 @@ def test_confirm_creates_a_pending_reservation_with_the_quote_frozen_onto_it(
         assert reservation.daily_rate == Decimal("1300.00")
         assert reservation.rental_days == 2
         assert reservation.pickup_location == "Main office"
+        assert reservation.renter_full_name == "Maria Santos"
+        assert reservation.renter_address == "123 Rizal Street, Barangay Centro, Cebu City"
+        assert reservation.driver_license_number == "N01-23-456789"
         assert f"/my/reservations/{reservation.id}" in response.headers["Location"]
+
+
+def test_confirm_requires_renter_address_and_driver_license(customer_client, vehicle_id, app):
+    data = window()
+    data["renter_address"] = ""
+    data["driver_license_number"] = ""
+
+    response = customer_client.post(f"/book/{vehicle_id}/confirm", data=data)
+
+    assert response.status_code == 400
+    body = response.get_data(as_text=True)
+    assert "Home address is required." in body
+    assert "Driver&#39;s license number is required." in body
+    with app.app_context():
+        assert get_session().query(Reservation).count() == 0
 
 
 def test_confirm_ignores_a_total_posted_by_the_client(customer_client, vehicle_id, app):
