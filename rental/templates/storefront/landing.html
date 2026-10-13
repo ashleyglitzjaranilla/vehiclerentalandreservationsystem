@@ -17,6 +17,11 @@
       <div class="mt-8 flex flex-wrap gap-3">
         <a class="btn btn-primary" href="{{ url_for('public.browse') }}">Browse Vehicles</a>
         <a class="btn btn-ghost" href="{{ url_for('public.browse') }}">Make a Reservation</a>
+        <a class="btn btn-ghost"
+           href="{{ url_for('static', filename='downloads/RidePy-Android-v1.0-debug.apk') }}"
+           download="RidePy-Android-v1.0-debug.apk">
+          Download Android App
+        </a>
       </div>
       <p class="mt-6 text-sm text-white/70">
         {{ available_count }} vehicle{{ '' if available_count == 1 else 's' }} available now
@@ -84,7 +89,14 @@
     <p class="text-base font-semibold text-ink sm:text-lg">
       Online reservation + vehicle availability + automatic rental calculation
     </p>
-    <a class="btn btn-primary mt-5 inline-flex" href="{{ url_for('public.browse') }}">Browse Vehicles</a>
+    <div class="mt-5 flex flex-wrap justify-center gap-3">
+      <a class="btn btn-primary" href="{{ url_for('public.browse') }}">Browse Vehicles</a>
+      <a class="btn btn-ghost"
+         href="{{ url_for('static', filename='downloads/RidePy-Android-v1.0-debug.apk') }}"
+         download="RidePy-Android-v1.0-debug.apk">
+        Download Android App
+      </a>
+    </div>
   </section>
 </div>
 {% endblock %}
