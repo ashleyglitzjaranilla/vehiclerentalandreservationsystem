@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">RidePy</string>
+    <string name="offline_title">RidePy is offline</string>
+    <string name="offline_message">Check your internet connection, then try again.</string>
+    <string name="retry">Try again</string>
+</resources>
