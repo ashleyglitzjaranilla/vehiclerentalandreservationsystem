@@ -76,6 +76,15 @@ def migrate_db_command():
         "renter_phone": "VARCHAR(30)",
         "renter_address": "VARCHAR(255)",
         "driver_license_number": "VARCHAR(60)",
+        "driver_license_image_ref": "VARCHAR(1000)",
+        "driver_license_original_name": "VARCHAR(255)",
+        "driver_license_content_type": "VARCHAR(80)",
+        "driver_license_file_size": "INTEGER",
+        "driver_license_verification_status": "VARCHAR(30) NOT NULL DEFAULT 'NOT_SUBMITTED'",
+        "driver_license_review_note": "VARCHAR(500)",
+        "driver_license_reviewed_by": "INTEGER",
+        "driver_license_uploaded_at": "TIMESTAMP",
+        "driver_license_reviewed_at": "TIMESTAMP",
     }
     added = []
     with engine.begin() as connection:

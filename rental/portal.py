@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from flask import Blueprint, abort, flash, redirect, render_template, url_for
+from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
 from sqlalchemy import func, select
 
 from .admin.reservations import apply_change
@@ -12,6 +12,7 @@ from .db import get_session
 from .domain.lifecycle import TransitionError, cancel_reservation
 from .forms import ProfileForm
 from .models import Rental, Reservation, User, Vehicle
+from .license_storage import LicenseUploadError, put_license, validate_license_image
 
 bp = Blueprint("portal", __name__, url_prefix="/my")
 
@@ -106,6 +107,34 @@ def reservation_detail(reservation_id: int):
         vehicle=vehicle,
         can_cancel=can_cancel(reservation),
     )
+
+
+@bp.route("/reservations/<int:reservation_id>/license", methods=["POST"])
+@customer_required
+def reupload_license(reservation_id: int):
+    reservation, _vehicle = owned_reservation(reservation_id)
+    if reservation.status != "PENDING" or reservation.driver_license_verification_status not in {
+        "REUPLOAD_REQUIRED", "REJECTED"
+    }:
+        abort(400)
+    try:
+        image = validate_license_image(request.files.get("driver_license_image"))
+        reference = put_license(image, reservation.id)
+    except LicenseUploadError as error:
+        flash(str(error), "warning")
+        return redirect(url_for("portal.reservation_detail", reservation_id=reservation.id))
+    reservation.driver_license_image_ref = reference
+    reservation.driver_license_original_name = image.original_name
+    reservation.driver_license_content_type = image.content_type
+    reservation.driver_license_file_size = len(image.data)
+    reservation.driver_license_verification_status = "PENDING_REVIEW"
+    reservation.driver_license_review_note = None
+    reservation.driver_license_reviewed_by = None
+    reservation.driver_license_reviewed_at = None
+    reservation.driver_license_uploaded_at = now()
+    get_session().commit()
+    flash("Your new license image was submitted for review.", "success")
+    return redirect(url_for("portal.reservation_detail", reservation_id=reservation.id))
 
 
 def owned_rental(rental_id: int) -> tuple[Rental, Vehicle]:

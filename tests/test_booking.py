@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from datetime import date, datetime, timedelta
 from decimal import Decimal
+from io import BytesIO
 
 import pytest
 
@@ -131,6 +132,8 @@ def window(**extra) -> dict:
         "driver_license_number": "N01-23-456789",
         "pickup_location": "Main office",
         "return_location": "Main office",
+        "license_consent": "1",
+        "driver_license_image": (BytesIO(b"\x89PNG\r\n\x1a\n" + b"test-image"), "license.png"),
     }
     data.update(extra)
     return data

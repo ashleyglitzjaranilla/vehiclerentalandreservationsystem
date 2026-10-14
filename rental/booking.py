@@ -21,6 +21,8 @@ from flask import (
 from . import scheduling
 from .auth import current_role, current_user, customer_required
 from .db import get_session
+from .clock import now
+from .license_storage import LicenseUploadError, put_license, validate_license_image
 from .models import Reservation, Vehicle
 
 bp = Blueprint("booking", __name__)
@@ -222,6 +224,13 @@ def confirm(vehicle_id: int):
         return bail
 
     details, errors = reservation_details_from_form()
+    license_image = None
+    try:
+        license_image = validate_license_image(request.files.get("driver_license_image"))
+    except LicenseUploadError as error:
+        errors["driver_license_image"] = str(error)
+    if request.form.get("license_consent") != "1":
+        errors["license_consent"] = "Consent is required to process this document."
     if errors:
         db = get_session()
         verdict = scheduling.availability_for(db, vehicle, interval)
@@ -305,6 +314,21 @@ def confirm(vehicle_id: int):
     # flush assigns the id that the reference number is built from.
     db.flush()
     reservation.assign_number()
+    try:
+        reservation.driver_license_image_ref = put_license(license_image, reservation.id)
+    except LicenseUploadError as error:
+        db.rollback()
+        errors["driver_license_image"] = str(error)
+        return render_template(
+            "booking/review.html", vehicle=vehicle, interval=interval, quote=priced,
+            pickup=request.form.get("pickup", ""), return_=request.form.get("return", ""),
+            driver=driver, insurance=insurance, details=details, errors=errors,
+        ), 503
+    reservation.driver_license_original_name = license_image.original_name
+    reservation.driver_license_content_type = license_image.content_type
+    reservation.driver_license_file_size = len(license_image.data)
+    reservation.driver_license_verification_status = "PENDING_REVIEW"
+    reservation.driver_license_uploaded_at = now()
     db.commit()
 
     flash(f"Reservation {reservation.reservation_number} was requested.", "success")

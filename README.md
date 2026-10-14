@@ -297,11 +297,14 @@ export.
 2. Push this repository to GitHub and import it at
    [vercel.com/new](https://vercel.com/new). No build command or framework
    preset is needed: Vercel finds the `app` object in the top-level `app.py`.
-3. Add two environment variables in the Vercel project settings:
+3. In the project's Storage tab, create a **Private** Vercel Blob store for
+   driver's-license images. Vercel adds `BLOB_READ_WRITE_TOKEN` to the project.
+4. Add these environment variables in the Vercel project settings:
    - `DATABASE_URL` — the pooled Neon connection string
    - `SECRET_KEY` — a long random string
-4. Deploy.
-5. Create the tables and the first account by running the CLI commands from
+   - `BLOB_READ_WRITE_TOKEN` — the token from the private Blob store
+5. Deploy.
+6. Create the tables and the first account by running the CLI commands from
    your own machine with `DATABASE_URL` set to the same Neon URL:
 
    ```bash

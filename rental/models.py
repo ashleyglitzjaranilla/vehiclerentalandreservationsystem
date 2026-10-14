@@ -245,6 +245,17 @@ class Reservation(Base):
     renter_phone: Mapped[str | None] = mapped_column(String(30), nullable=True)
     renter_address: Mapped[str | None] = mapped_column(String(255), nullable=True)
     driver_license_number: Mapped[str | None] = mapped_column(String(60), nullable=True)
+    driver_license_image_ref: Mapped[str | None] = mapped_column(String(1000), nullable=True)
+    driver_license_original_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    driver_license_content_type: Mapped[str | None] = mapped_column(String(80), nullable=True)
+    driver_license_file_size: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    driver_license_verification_status: Mapped[str] = mapped_column(
+        String(30), nullable=False, default="NOT_SUBMITTED"
+    )
+    driver_license_review_note: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    driver_license_reviewed_by: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    driver_license_uploaded_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    driver_license_reviewed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
     want_additional_driver: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     want_insurance: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
@@ -284,6 +295,11 @@ class Reservation(Base):
     @property
     def badge_class(self) -> str:
         return RESERVATION_BADGES.get(self.status, "pill-slate")
+
+    @property
+    def masked_driver_license_number(self) -> str:
+        value = self.driver_license_number or ""
+        return ("•" * max(0, len(value) - 4)) + value[-4:] if value else "—"
 
     def __repr__(self) -> str:
         return f"<Reservation {self.reservation_number} {self.status}>"

@@ -10,10 +10,10 @@ from __future__ import annotations
 
 from decimal import Decimal
 
-from flask import Blueprint, abort, flash, redirect, render_template, url_for
+from flask import Blueprint, Response, abort, flash, redirect, render_template, request, url_for
 from sqlalchemy import select
 
-from ..auth import admin_required
+from ..auth import admin_required, current_user
 from ..clock import now
 from ..db import get_session
 from ..domain.lifecycle import (
@@ -24,6 +24,7 @@ from ..domain.lifecycle import (
     start_rental,
 )
 from ..models import Rental, Reservation, User, Vehicle
+from ..license_storage import get_license
 
 bp = Blueprint("admin_reservations", __name__, url_prefix="/admin/reservations")
 
@@ -110,7 +111,50 @@ def decide(reservation_id: int, action, verb: str):
 @admin_required
 def confirm(reservation_id: int):
     """Accept a pending request. The vehicle is now spoken for."""
+    reservation = load_reservation(reservation_id)
+    if reservation.driver_license_verification_status != "VERIFIED":
+        flash("Verify the driver's-license attachment before confirming this reservation.", "warning")
+        return redirect(url_for("admin_reservations.queue"))
     return decide(reservation_id, confirm_reservation, "confirmed")
+
+
+@bp.route("/<int:reservation_id>/license")
+@admin_required
+def license_image(reservation_id: int):
+    reservation = load_reservation(reservation_id)
+    if not reservation.driver_license_image_ref:
+        abort(404)
+    stream = get_license(reservation.driver_license_image_ref)
+    if stream is None:
+        abort(404)
+    response = Response(stream, content_type=reservation.driver_license_content_type or "application/octet-stream")
+    response.headers["Content-Disposition"] = "inline"
+    response.headers["Cache-Control"] = "private, no-store"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    return response
+
+
+@bp.route("/<int:reservation_id>/license/review", methods=["POST"])
+@admin_required
+def review_license(reservation_id: int):
+    reservation = load_reservation(reservation_id)
+    action = request.form.get("action")
+    statuses = {"verify": "VERIFIED", "reject": "REJECTED", "reupload": "REUPLOAD_REQUIRED"}
+    if action not in statuses:
+        abort(400)
+    if action in {"verify", "reject"} and not reservation.driver_license_image_ref:
+        abort(400)
+    note = request.form.get("note", "").strip()
+    if action in {"reject", "reupload"} and not note:
+        flash("Add a reason before rejecting or requesting a new image.", "warning")
+        return redirect(url_for("admin_reservations.queue"))
+    reservation.driver_license_verification_status = statuses[action]
+    reservation.driver_license_review_note = note[:500] or None
+    reservation.driver_license_reviewed_by = current_user().id
+    reservation.driver_license_reviewed_at = now()
+    get_session().commit()
+    flash(f"License review saved as {statuses[action].replace('_', ' ').title()}.", "success")
+    return redirect(url_for("admin_reservations.queue"))
 
 
 @bp.route("/<int:reservation_id>/reject", methods=["POST"])

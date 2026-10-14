@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from datetime import date, timedelta
 from decimal import Decimal
+from io import BytesIO
 
 import pytest
 
@@ -81,6 +82,8 @@ def test_a_booking_travels_from_browse_to_a_completed_late_rental(
             driver_license_number="N01-23-456789",
             pickup_location="Main office",
             return_location="Main office",
+            license_consent="1",
+            driver_license_image=(BytesIO(b"\x89PNG\r\n\x1a\njourney"), "license.png"),
         ),
     )
     with app.app_context():
@@ -94,7 +97,10 @@ def test_a_booking_travels_from_browse_to_a_completed_late_rental(
         f"/vehicles?pickup={window['pickup']}&return={window['return']}"
     ).get_data(as_text=True)
 
-    # 5. The admin confirms it, then hands over the keys.
+    # 5. The admin verifies the private attachment, confirms it, then hands over the keys.
+    admin_client.post(
+        f"/admin/reservations/{reservation_id}/license/review", data={"action": "verify"}
+    )
     admin_client.post(f"/admin/reservations/{reservation_id}/confirm")
     admin_client.post(f"/admin/reservations/{reservation_id}/start")
     with app.app_context():

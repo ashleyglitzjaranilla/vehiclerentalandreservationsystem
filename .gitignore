@@ -27,3 +27,6 @@ android-app/local.properties
 android-app/**/build/
 *.jks
 *.keystore
+
+.vercel
+.env*

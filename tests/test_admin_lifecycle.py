@@ -52,6 +52,9 @@ def add_reservation(app, vehicle_id, *, status="PENDING", starts_in_days=1, days
             base_amount=Decimal("1300.00") * days,
             additional_fees=Decimal("0.00"),
             total_amount=Decimal("1300.00") * days,
+            driver_license_image_ref="test-license.png",
+            driver_license_content_type="image/png",
+            driver_license_verification_status="VERIFIED",
             status=status,
         )
         db.add(reservation)
