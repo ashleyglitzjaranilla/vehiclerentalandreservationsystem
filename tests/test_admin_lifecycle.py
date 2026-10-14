@@ -124,6 +124,24 @@ def test_a_customer_cannot_confirm_a_reservation(customer_client, app, vehicle_i
         assert get_session().get(Reservation, reservation_id).status == "PENDING"
 
 
+def test_admin_can_view_a_private_license_attachment(admin_client, app, vehicle_id):
+    reservation_id = add_reservation(app, vehicle_id)
+    app.extensions.setdefault("test_license_blobs", {})["test-license.png"] = b"private-image"
+
+    response = admin_client.get(f"/admin/reservations/{reservation_id}/license")
+
+    assert response.status_code == 200
+    assert response.data == b"private-image"
+    assert response.content_type == "image/png"
+    assert response.headers["Cache-Control"] == "private, no-store"
+    assert response.headers["X-Content-Type-Options"] == "nosniff"
+
+
+def test_customer_cannot_view_a_private_license_attachment(customer_client, app, vehicle_id):
+    reservation_id = add_reservation(app, vehicle_id)
+    assert customer_client.get(f"/admin/reservations/{reservation_id}/license").status_code == 403
+
+
 def test_confirm_404s_on_a_reservation_that_does_not_exist(admin_client):
     assert admin_client.post("/admin/reservations/9999/confirm").status_code == 404
 

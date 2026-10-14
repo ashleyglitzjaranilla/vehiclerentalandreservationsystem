@@ -81,4 +81,7 @@ def get_license(reference: str):
     result = BlobClient().get(reference, access="private")
     if result is None or result.status_code != 200:
         return None
-    return result.stream
+    # The synchronous Python SDK returns the downloaded bytes as ``content``.
+    # ``stream`` belongs to AsyncBlobClient's result and raises AttributeError
+    # here, which previously made the admin View attachment action return 500.
+    return [result.content]
