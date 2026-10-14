@@ -1,5 +1,7 @@
 # Never upload local secrets or the local database.
 .env
+.env.*
+env
 *.db
 
 # Local tooling that the deployed app does not need.
@@ -7,6 +9,16 @@
 tests/
 .pytest_cache/
 __pycache__/
+.vs/
+
+# Local documentation, screenshots, build helpers, and Android deliverables.
+docs/
+scripts/
+/*.pdf
+/*.docx
+/*.html
+/*.apk
+android-app/
 
 # CSS build sources. Only the built rental/static/css/output.css is served,
 # and it is committed, so Vercel needs no build step.
